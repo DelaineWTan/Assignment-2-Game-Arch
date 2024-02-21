@@ -44,6 +44,29 @@ class GameViewController: UIViewController {
         // show statistics such as fps and timing information
         scnView.showsStatistics = true
         
+        // add camera facing start of maze
+        // Create a camera node
+        let cameraNode = SCNNode()
+        cameraNode.camera = SCNCamera()
+
+        // Set the position of the camera at the entrance of the maze
+        let entrancePosition = SCNVector3(x: 0, y: 0, z: 0) // Assuming entrance is at the origin (adjust as needed)
+        let cameraOffset = SCNVector3(x: 0, y: 1, z: -5) // Adjust the offset to position the camera correctly
+        cameraNode.position = SCNVector3(
+            x: entrancePosition.x + cameraOffset.x,
+            y: entrancePosition.y + cameraOffset.y,
+            z: entrancePosition.z + cameraOffset.z
+        )
+
+        // Set the orientation of the camera to face inside the maze
+        cameraNode.eulerAngles = SCNVector3(x: 0, y: .pi, z: 0) // Rotate the camera 180 degrees around the y-axis
+
+        // Add the camera node to the scene
+        scene.rootNode.addChildNode(cameraNode)
+
+        // Set the scene's default camera
+        scnView.pointOfView = cameraNode
+        
         // configure the view
         scnView.backgroundColor = UIColor.black
         
@@ -110,13 +133,6 @@ class GameViewController: UIViewController {
         } else {
             return .all
         }
-    }
-    
-    enum Direction: Int {
-        case north = 0
-        case east
-        case south
-        case west
     }
     
     func createMazeNode() -> SCNNode {
@@ -195,7 +211,7 @@ class GameViewController: UIViewController {
     
     
     func addCube() {
-        let theCube = SCNNode(geometry: SCNBox(width: 1, height: 1, length: 1, chamferRadius: 0)) // Create a object node of box shape with width of 1 and height of 1
+        let theCube = SCNNode(geometry: SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0)) // Create a object node of box shape with width of 1 and height of 1
         theCube.name = "The Cube" // Name the node so we can reference it later
         theCube.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "crate.jpg") // Diffuse the crate image material across the whole cube
         theCube.position = SCNVector3(0, 0, 0) // Put the cube at position (0, 0, 0)
@@ -216,4 +232,5 @@ class GameViewController: UIViewController {
             reanimate()
         }
     }
+    
 }
