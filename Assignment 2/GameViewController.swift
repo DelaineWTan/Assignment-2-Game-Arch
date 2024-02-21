@@ -16,6 +16,8 @@ class GameViewController: UIViewController {
     let mazeCols = 5;
     var isDaytime = true // Flag to track if it's daytime or nighttime
     let ambientLightNode = SCNNode()
+    var scnView: SCNView?
+    var lastPanLocation: CGPoint?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,7 +36,12 @@ class GameViewController: UIViewController {
         scene.rootNode.addChildNode(ambientLightNode)
         
         // retrieve the SCNView
-        let scnView = self.view as! SCNView
+        scnView = self.view as? SCNView
+        
+        guard let scnView = scnView else {
+            print("scnView is nil")
+            return
+        }
         
         // set the scene to the view
         scnView.scene = scene
@@ -71,10 +78,6 @@ class GameViewController: UIViewController {
         // configure the view
         scnView.backgroundColor = UIColor.black
         
-        // add a tap gesture recognizer
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-        scnView.addGestureRecognizer(tapGesture)
-        
         // Create rotating crate at 0,0 (start of maze)
         addCube()
         reanimate()
@@ -97,6 +100,19 @@ class GameViewController: UIViewController {
             toggleButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             toggleButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
+        
+        // add a tap gesture recognizer
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        scnView.addGestureRecognizer(tapGesture)
+        
+        // Add pan gesture recognizer for movement
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
+        scnView.addGestureRecognizer(panGesture)
+
+        // Add double tap gesture recognizer for reset
+        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
+        doubleTapGesture.numberOfTapsRequired = 2
+        scnView.addGestureRecognizer(doubleTapGesture)
     }
     
     
@@ -135,6 +151,47 @@ class GameViewController: UIViewController {
             
             SCNTransaction.commit()
         }
+    }
+    
+    @objc func handlePan(_ gestureRecognizer: UIPanGestureRecognizer) {
+        let translation = gestureRecognizer.translation(in: scnView)
+        let location = gestureRecognizer.location(in: scnView)
+        
+        if let lastPanLocation = lastPanLocation {
+            // Calculate the difference in movement
+            let deltaX = Float(location.x - lastPanLocation.x)
+            let deltaY = Float(location.y - lastPanLocation.y)
+            print(deltaX, "|", deltaY)
+            // Adjust the camera position based on the movement
+            let currentPosition = scnView?.pointOfView!.position
+
+            guard let currentPosition = currentPosition else {
+                print("current position is nil")
+                // Handle the case where currentPosition is nil
+                return
+            }
+            let newPosition = SCNVector3(currentPosition.x + deltaX * 0.01, currentPosition.y, currentPosition.z - deltaY * 0.01)
+            scnView?.pointOfView!.position = newPosition
+        }
+        
+        // Update last pan location
+        lastPanLocation = location
+        
+        if gestureRecognizer.state == .ended {
+            // Reset last pan location when gesture ends
+            lastPanLocation = nil
+        }
+    }
+    
+    @objc func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
+        // Reset the camera position to the default view
+        let entrancePosition = SCNVector3(x: 0, y: 0, z: 0) // Assuming entrance is at the origin (adjust as needed)
+        let cameraOffset = SCNVector3(x: 0, y: 1, z: -5) // Adjust the offset to position the camera correctly
+        scnView?.pointOfView!.position = SCNVector3(
+            x: entrancePosition.x + cameraOffset.x,
+            y: entrancePosition.y + cameraOffset.y,
+            z: entrancePosition.z + cameraOffset.z
+        )
     }
     
     override var prefersStatusBarHidden: Bool {
