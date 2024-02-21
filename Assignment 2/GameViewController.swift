@@ -14,6 +14,8 @@ class GameViewController: UIViewController {
     var rotAngle = 0.0 // Keep track of crate rotation angle
     let mazeRows = 5;
     let mazeCols = 5;
+    var isDaytime = true // Flag to track if it's daytime or nighttime
+    let ambientLightNode = SCNNode()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +28,6 @@ class GameViewController: UIViewController {
         scene.rootNode.addChildNode(lightNode)
         
         // create and add an ambient light to the scene
-        let ambientLightNode = SCNNode()
         ambientLightNode.light = SCNLight()
         ambientLightNode.light!.type = .ambient
         ambientLightNode.light!.color = UIColor.darkGray
@@ -83,6 +84,19 @@ class GameViewController: UIViewController {
         
         // Add the maze node to the scene
         scene.rootNode.addChildNode(mazeNode)
+        
+        // Add button to toggle day/night
+        let toggleButton = UIButton(type: .system)
+        toggleButton.setTitle("Toggle Day/Night", for: .normal)
+        toggleButton.addTarget(self, action: #selector(toggleDayNight), for: .touchUpInside)
+        toggleButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(toggleButton)
+        
+        // Add constraints for button position
+        NSLayoutConstraint.activate([
+            toggleButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            toggleButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+        ])
     }
     
     
@@ -233,4 +247,16 @@ class GameViewController: UIViewController {
         }
     }
     
+    // Method to toggle day and night
+    @objc
+    func toggleDayNight() {
+        if isDaytime {
+            // Set nighttime color
+            ambientLightNode.light?.color = UIColor.darkGray
+        } else {
+            // Set daytime color
+            ambientLightNode.light?.color = UIColor.white
+        }
+        isDaytime = !isDaytime // Toggle the flag
+    }
 }
