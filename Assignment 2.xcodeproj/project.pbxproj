@@ -18,6 +18,12 @@
 		0CF5B3492B8183AE003489DC /* Assignment_2UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5B3482B8183AE003489DC /* Assignment_2UITestsLaunchTests.swift */; };
 		0CF5B35A2B8183E2003489DC /* DisjointSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5B3562B8183E2003489DC /* DisjointSet.cpp */; };
 		0CF5B35B2B8183E2003489DC /* maze.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5B3592B8183E2003489DC /* maze.cpp */; };
+		0E6736E22B855E7200591764 /* crate.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0E6736E12B855E7200591764 /* crate.jpg */; };
+		0E6736FC2B85757100591764 /* north.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E6736FB2B85757100591764 /* north.png */; };
+		0E6736FF2B85778700591764 /* floor.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E6736FE2B85778700591764 /* floor.png */; };
+		0E6737012B85783F00591764 /* south.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 0E6737002B85783F00591764 /* south.jpeg */; };
+		0E6737032B85790B00591764 /* east.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 0E6737022B85790B00591764 /* east.jpeg */; };
+		0E6737052B85793A00591764 /* west.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 0E6737042B85793A00591764 /* west.jpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +61,12 @@
 		0CF5B3572B8183E2003489DC /* maze.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = maze.h; sourceTree = "<group>"; };
 		0CF5B3582B8183E2003489DC /* DisjointSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisjointSet.h; sourceTree = "<group>"; };
 		0CF5B3592B8183E2003489DC /* maze.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = maze.cpp; sourceTree = "<group>"; };
+		0E6736E12B855E7200591764 /* crate.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = crate.jpg; sourceTree = "<group>"; };
+		0E6736FB2B85757100591764 /* north.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = north.png; sourceTree = "<group>"; };
+		0E6736FE2B85778700591764 /* floor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = floor.png; sourceTree = "<group>"; };
+		0E6737002B85783F00591764 /* south.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = south.jpeg; sourceTree = "<group>"; };
+		0E6737022B85790B00591764 /* east.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = east.jpeg; sourceTree = "<group>"; };
+		0E6737042B85793A00591764 /* west.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = west.jpeg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +128,12 @@
 				0CF5B3592B8183E2003489DC /* maze.cpp */,
 				0CF5B3572B8183E2003489DC /* maze.h */,
 				0CF5B3552B8183E1003489DC /* Assignment 2-Bridging-Header.h */,
+				0E6736E12B855E7200591764 /* crate.jpg */,
+				0E6736FB2B85757100591764 /* north.png */,
+				0E6737002B85783F00591764 /* south.jpeg */,
+				0E6737022B85790B00591764 /* east.jpeg */,
+				0E6737042B85793A00591764 /* west.jpeg */,
+				0E6736FE2B85778700591764 /* floor.png */,
 			);
 			path = "Assignment 2";
 			sourceTree = "<group>";
@@ -242,10 +260,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0E6736FC2B85757100591764 /* north.png in Resources */,
 				0CF5B3292B8183AC003489DC /* art.scnassets in Resources */,
 				0CF5B3332B8183AE003489DC /* LaunchScreen.storyboard in Resources */,
 				0CF5B3302B8183AE003489DC /* Assets.xcassets in Resources */,
+				0E6737012B85783F00591764 /* south.jpeg in Resources */,
+				0E6736E22B855E7200591764 /* crate.jpg in Resources */,
 				0CF5B32E2B8183AC003489DC /* Main.storyboard in Resources */,
+				0E6737052B85793A00591764 /* west.jpeg in Resources */,
+				0E6737032B85790B00591764 /* east.jpeg in Resources */,
+				0E6736FF2B85778700591764 /* floor.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
