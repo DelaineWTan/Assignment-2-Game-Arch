@@ -30,7 +30,7 @@ class GameViewController: UIViewController {
         // create and add an ambient light to the scene
         ambientLightNode.light = SCNLight()
         ambientLightNode.light!.type = .ambient
-        ambientLightNode.light!.color = UIColor.darkGray
+        ambientLightNode.light!.color = UIColor.white
         scene.rootNode.addChildNode(ambientLightNode)
         
         // retrieve the SCNView
@@ -159,10 +159,16 @@ class GameViewController: UIViewController {
         let cellSize: CGFloat = 1.0
         let wallThickness: CGFloat = 0.1
         // Adjust the position of the walls to avoid perfect overlap
-        let wallOffset: Float = 0.05 // Adjust as needed
+        let wallOffset: Float = -0.05 // Adjust as needed
 
         // Load the floor texture image
         let floorTexture = UIImage(named: "floor.png") // Replace "floorTexture.jpg" with the actual name of your floor texture image
+        
+        // Define textures for different wall configurations
+        let noWallTexture = "no_walls.jpeg"
+        let leftWallTexture = "left_wall.jpeg"
+        let rightWallTexture = "right_wall.jpeg"
+        let bothWallsTexture = "both_walls.jpeg"
         
         // Iterate through maze cells
         for row in 0..<maze.rows {
@@ -184,27 +190,67 @@ class GameViewController: UIViewController {
                 
                 // Check walls and create them if present
                 if cell.northWallPresent {
+                    var textureName = noWallTexture
+                    // East is left of north, west is right of north
+                    if cell.eastWallPresent && cell.westWallPresent {
+                        textureName = bothWallsTexture
+                    } else if cell.westWallPresent {
+                        textureName = rightWallTexture
+                    } else if cell.eastWallPresent {
+                        textureName = leftWallTexture
+                    }
+                    
                     // Create north wall with offset
                     let northWallNode = createWall(position: SCNVector3(cellPosition.x, Float(wallThickness)/2, cellPosition.z - Float(cellSize/2) - wallOffset),
-                                                   width: cellSize, height: 1, length: wallThickness, textureName: "north.png", inScene: scene)
+                                                   width: cellSize, height: 1, length: wallThickness, textureName: textureName, inScene: scene)
                     mazeNode.addChildNode(northWallNode)
                 }
                 if cell.southWallPresent {
+                    var textureName = noWallTexture
+                    // West is left of south, east is right of south
+                    if cell.westWallPresent && cell.eastWallPresent {
+                        textureName = bothWallsTexture
+                    } else if cell.westWallPresent {
+                        textureName = leftWallTexture
+                    } else if cell.eastWallPresent {
+                        textureName = rightWallTexture
+                    }
+                    
                     // Create south wall with offset
                     let southWallNode = createWall(position: SCNVector3(cellPosition.x, Float(wallThickness)/2, cellPosition.z + Float(cellSize)/2 + wallOffset),
-                                                   width: cellSize, height: 1, length: wallThickness, textureName: "south.jpeg", inScene: scene)
+                                                   width: cellSize, height: 1, length: wallThickness, textureName: textureName, inScene: scene)
                     mazeNode.addChildNode(southWallNode)
                 }
                 if cell.eastWallPresent {
+                    var textureName = noWallTexture
+                    // South is left of east, north is right of east
+                    if cell.southWallPresent && cell.northWallPresent {
+                        textureName = bothWallsTexture
+                    } else if cell.southWallPresent {
+                        textureName = leftWallTexture
+                    } else if cell.northWallPresent {
+                        textureName = rightWallTexture
+                    }
+                    
                     // Create east wall with offset
                     let eastWallNode = createWall(position: SCNVector3(cellPosition.x + Float(cellSize)/2 + wallOffset, Float(wallThickness)/2, cellPosition.z),
-                                                  width: wallThickness, height: 1, length: cellSize, textureName: "east.jpeg", inScene: scene)
+                                                  width: wallThickness, height: 1, length: cellSize, textureName: textureName, inScene: scene)
                     mazeNode.addChildNode(eastWallNode)
                 }
                 if cell.westWallPresent {
+                    var textureName = noWallTexture
+                    // North is left of west, south is right of west
+                    if cell.northWallPresent && cell.southWallPresent {
+                        textureName = bothWallsTexture
+                    } else if cell.southWallPresent {
+                        textureName = rightWallTexture
+                    } else if cell.northWallPresent {
+                        textureName = leftWallTexture
+                    }
+                    
                     // Create west wall with offset
                     let westWallNode = createWall(position: SCNVector3(cellPosition.x - Float(cellSize)/2 - wallOffset, Float(wallThickness)/2, cellPosition.z),
-                                                  width: wallThickness, height: 1, length: cellSize, textureName: "west.jpeg", inScene: scene)
+                                                  width: wallThickness, height: 1, length: cellSize, textureName: textureName, inScene: scene)
                     mazeNode.addChildNode(westWallNode)
                 }
             }
