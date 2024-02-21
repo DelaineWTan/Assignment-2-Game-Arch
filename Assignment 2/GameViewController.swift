@@ -188,7 +188,6 @@ class GameViewController: UIViewController {
                     let northWallNode = createWall(position: SCNVector3(cellPosition.x, Float(wallThickness)/2, cellPosition.z - Float(cellSize/2) - wallOffset),
                                                    width: cellSize, height: 1, length: wallThickness, textureName: "north.png", inScene: scene)
                     mazeNode.addChildNode(northWallNode)
-
                 }
                 if cell.southWallPresent {
                     // Create south wall with offset
