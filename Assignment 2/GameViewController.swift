@@ -9,7 +9,7 @@ import UIKit
 import QuartzCore
 import SceneKit
 
-class GameViewController: UIViewController {
+class GameViewController: UIViewController, UIGestureRecognizerDelegate {
     let scene = SCNScene(named: "art.scnassets/main.scn")!
     var rotAngle = 0.0 // Keep track of crate rotation angle
     let mazeRows = 5;
@@ -26,6 +26,8 @@ class GameViewController: UIViewController {
     var fogEndTextField: UITextField!
     var fogDensityTextField: UITextField!
     var isFogEnabled = false;
+    var consoleView: UIView?
+    var isConsoleVisible = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -126,6 +128,19 @@ class GameViewController: UIViewController {
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
         doubleTapGesture.numberOfTapsRequired = 2
         scnView.addGestureRecognizer(doubleTapGesture)
+        
+        // Add a two-finger double-tap gesture recognizer
+        let twoFingerDoubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTwoFingerDoubleTap(_:)))
+        twoFingerDoubleTapGesture.numberOfTapsRequired = 2
+        twoFingerDoubleTapGesture.numberOfTouchesRequired = 2
+        twoFingerDoubleTapGesture.delegate = self
+        view.addGestureRecognizer(twoFingerDoubleTapGesture)
+        
+        // Initialize the console view
+        consoleView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 200))
+        consoleView?.backgroundColor = UIColor.white
+        consoleView?.alpha = 0.0 // Initially hidden
+        view.addSubview(consoleView!)
     }
     
     @objc
@@ -202,6 +217,36 @@ class GameViewController: UIViewController {
         )
     }
     
+    // Handle the two-finger double-tap gesture
+    @objc func handleTwoFingerDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
+        if isConsoleVisible {
+            hideConsole()
+        } else {
+            showConsole()
+        }
+    }
+    
+    // Show the console view
+    func showConsole() {
+        UIView.animate(withDuration: 0.3) {
+            self.consoleView?.alpha = 1.0
+        }
+        isConsoleVisible = true
+    }
+    
+    // Hide the console view
+    func hideConsole() {
+        UIView.animate(withDuration: 0.3) {
+            self.consoleView?.alpha = 0.0
+        }
+        isConsoleVisible = false
+    }
+    
+    // Allow simultaneous recognition of multiple gestures
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
     override var prefersStatusBarHidden: Bool {
         return true
     }
@@ -227,7 +272,7 @@ class GameViewController: UIViewController {
         let wallOffset: Float = -0.05 // Adjust as needed
         
         // Load the floor texture image
-        let floorTexture = UIImage(named: "floor.png") // Replace "floorTexture.jpg" with the actual name of your floor texture image
+        let floorTexture = UIImage(named: "floor.png")
         
         // Define textures for different wall configurations
         let noWallTexture = "no_walls.jpeg"
@@ -462,10 +507,6 @@ class GameViewController: UIViewController {
         return label
     }
     
-    
-    
-    
-    
     @objc func fogSwitchChanged(_ sender: UISwitch) {
         // Toggle fog on/off based on switch state
         if sender.isOn {
@@ -485,19 +526,12 @@ class GameViewController: UIViewController {
             print("Invalid fog parameter values")
             return
         }
-        
-        // Print debug information before setting fog values
-        print("Setting fog density: \(fogDensityValue), start distance: \(fogStartValue), end distance: \(fogEndValue)")
-        
         // Set fog values in the scene
         scene.fogStartDistance = CGFloat(fogStartValue)
         scene.fogEndDistance = CGFloat(fogEndValue)
         scene.fogDensityExponent = CGFloat(fogDensityValue)
         scene.fogColor = UIColor.white
         isFogEnabled = true
-        
-        // Print debug information after setting fog values
-        print("Fog enabled with density: \(scene.fogDensityExponent), start distance: \(scene.fogStartDistance), end distance: \(scene.fogEndDistance)")
     }
     
     func disableFog() {

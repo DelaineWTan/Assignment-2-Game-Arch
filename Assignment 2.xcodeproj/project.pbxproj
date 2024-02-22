@@ -24,6 +24,7 @@
 		0E67370D2B857E7B00591764 /* left_wall.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 0E6737092B857E7B00591764 /* left_wall.jpeg */; };
 		0E67370F2B857E7B00591764 /* right_wall.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 0E67370B2B857E7B00591764 /* right_wall.jpeg */; };
 		0EA6C9312B86A9C5004B6C68 /* no_walls.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 0EA6C9302B86A9C5004B6C68 /* no_walls.jpeg */; };
+		0EA6C9332B86D88A004B6C68 /* MiniMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA6C9322B86D88A004B6C68 /* MiniMapView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 		0E6737092B857E7B00591764 /* left_wall.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = left_wall.jpeg; sourceTree = "<group>"; };
 		0E67370B2B857E7B00591764 /* right_wall.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = right_wall.jpeg; sourceTree = "<group>"; };
 		0EA6C9302B86A9C5004B6C68 /* no_walls.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = no_walls.jpeg; sourceTree = "<group>"; };
+		0EA6C9322B86D88A004B6C68 /* MiniMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMapView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +122,7 @@
 				0CF5B3262B8183AC003489DC /* AppDelegate.swift */,
 				0CF5B3282B8183AC003489DC /* art.scnassets */,
 				0CF5B32A2B8183AC003489DC /* GameViewController.swift */,
+				0EA6C9322B86D88A004B6C68 /* MiniMapView.swift */,
 				0CF5B32C2B8183AC003489DC /* Main.storyboard */,
 				0CF5B32F2B8183AE003489DC /* Assets.xcassets */,
 				0CF5B3312B8183AE003489DC /* LaunchScreen.storyboard */,
@@ -298,6 +301,7 @@
 				0CF5B32B2B8183AC003489DC /* GameViewController.swift in Sources */,
 				0CF5B35B2B8183E2003489DC /* maze.cpp in Sources */,
 				0CF5B3272B8183AC003489DC /* AppDelegate.swift in Sources */,
+				0EA6C9332B86D88A004B6C68 /* MiniMapView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
