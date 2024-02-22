@@ -70,7 +70,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // Set the position of the camera at the entrance of the maze
         let entrancePosition = SCNVector3(x: 0, y: 0, z: 0) // Assuming entrance is at the origin (adjust as needed)
-        let cameraOffset = SCNVector3(x: 0, y: 1, z: -5) // Adjust the offset to position the camera correctly
+        let cameraOffset = SCNVector3(x: 0, y: 0.2, z: -3)
         cameraNode.position = SCNVector3(
             x: entrancePosition.x + cameraOffset.x,
             y: entrancePosition.y + cameraOffset.y,
@@ -223,13 +223,15 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
     
     @objc func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
         // Reset the camera position to the default view
-        let entrancePosition = SCNVector3(x: 0, y: 0, z: 0) // Assuming entrance is at the origin (adjust as needed)
-        let cameraOffset = SCNVector3(x: 0, y: 1, z: -5) // Adjust the offset to position the camera correctly
+        let entrancePosition = SCNVector3(x: 0, y: 0, z: 0) // Assuming entrance is at the origin
+        let cameraOffset = SCNVector3(x: 0, y: 0.2, z: -3)
         scnView?.pointOfView!.position = SCNVector3(
             x: entrancePosition.x + cameraOffset.x,
             y: entrancePosition.y + cameraOffset.y,
             z: entrancePosition.z + cameraOffset.z
         )
+        // Set the orientation of the camera to face inside the maze
+        scnView?.pointOfView!.eulerAngles = SCNVector3(x: 0, y: .pi, z: 0)
     }
     
     // Handle the two-finger double-tap gesture
