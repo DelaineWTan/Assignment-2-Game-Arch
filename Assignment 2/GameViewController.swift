@@ -10,24 +10,30 @@ import QuartzCore
 import SceneKit
 
 class GameViewController: UIViewController, UIGestureRecognizerDelegate {
+    // Scene variables
     let scene = SCNScene(named: "art.scnassets/main.scn")!
-    var rotAngle = 0.0 // Keep track of crate rotation angle
+    var scnView: SCNView?
+    let cameraNode = SCNNode()
+    var lastPanLocation: CGPoint?
+    var playerPosition: SCNVector3?
+    // Maze dimensions
     let mazeRows = 5;
     let mazeCols = 5;
-    var isDaytime = true // Flag to track if it's daytime or nighttime
-    let cameraNode = SCNNode()
+    // Light variables
     let ambientLightNode = SCNNode()
     var flashlightNode = SCNNode()
-    var scnView: SCNView?
-    var lastPanLocation: CGPoint?
+    var isDaytime = true
     // Fog variables
     var fogSwitch: UISwitch!
     var fogStartTextField: UITextField!
     var fogEndTextField: UITextField!
     var fogDensityTextField: UITextField!
     var isFogEnabled = false;
+    // Console variables
     var consoleView: UIView?
     var isConsoleVisible = false
+    // Cube rotation
+    var rotAngle = 0.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,6 +89,9 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         // Add the camera node to the scene
         scene.rootNode.addChildNode(cameraNode)
         
+        // Init player position to camera position
+        playerPosition = cameraNode.position
+        
         // Set the scene's default camera
         scnView.pointOfView = cameraNode
         
@@ -137,7 +146,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addGestureRecognizer(twoFingerDoubleTapGesture)
         
         // Initialize the console view
-        consoleView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 200))
+        consoleView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 250))
         consoleView?.backgroundColor = UIColor.white
         consoleView?.alpha = 0.0 // Initially hidden
         view.addSubview(consoleView!)
@@ -209,6 +218,9 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             } else if cameraNode.eulerAngles.y < -.pi {
                 cameraNode.eulerAngles.y += .pi * 2
             }
+            
+            // Update player position
+            playerPosition = cameraNode.position
         }
         
         // Update last pan location
@@ -240,10 +252,12 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             hideConsole()
         } else {
             showConsole()
-            // Add minimap view to the console view
-            let minimapView = MiniMapView(frame: consoleView!.bounds)
+            // Add minimap view to the console view with padding at the top
+            let padding: CGFloat = 50
+            let minimapView = MiniMapView(frame: CGRect(x: 0, y: padding, width: consoleView!.bounds.width, height: consoleView!.bounds.height - padding), rows: mazeRows, cols: mazeCols, playerPosition: playerPosition)
             minimapView.backgroundColor = .clear
             consoleView?.addSubview(minimapView)
+
         }
     }
     
