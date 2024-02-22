@@ -186,15 +186,29 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             // Calculate the difference in movement
             let deltaX = Float(location.x - lastPanLocation.x)
             let deltaY = Float(location.y - lastPanLocation.y)
-            // Adjust the camera position based on the movement
-            let currentPosition = scnView?.pointOfView!.position
             
-            guard let currentPosition = currentPosition else {
-                print("current position is nil")
+            // Adjust the camera position based on the movement
+            guard let cameraNode = scnView?.pointOfView else {
                 return
             }
-            let newPosition = SCNVector3(currentPosition.x + deltaX * 0.01, currentPosition.y, currentPosition.z - deltaY * 0.01)
-            scnView?.pointOfView!.position = newPosition
+            
+            // Adjust player position forward and backward along the X-axis
+            let xDelta = deltaY * 0.01 // deltaY corresponds to vertical movement
+            let currentRotationY = cameraNode.eulerAngles.y
+            let newX = cameraNode.position.x - sin(currentRotationY) * xDelta
+            let newZ = cameraNode.position.z - cos(currentRotationY) * xDelta
+            cameraNode.position = SCNVector3(newX, cameraNode.position.y, newZ)
+            
+            // Adjust player rotation left and right along the Y-axis
+            let yDelta = deltaX * 0.01 // deltaX corresponds to horizontal movement
+            cameraNode.eulerAngles.y += yDelta
+            
+            // Ensure that the player's rotation remains within a reasonable range
+            if cameraNode.eulerAngles.y > .pi {
+                cameraNode.eulerAngles.y -= .pi * 2
+            } else if cameraNode.eulerAngles.y < -.pi {
+                cameraNode.eulerAngles.y += .pi * 2
+            }
         }
         
         // Update last pan location
@@ -205,6 +219,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             lastPanLocation = nil
         }
     }
+
     
     @objc func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
         // Reset the camera position to the default view
