@@ -15,13 +15,22 @@ class GameViewController: UIViewController {
     let mazeRows = 5;
     let mazeCols = 5;
     var isDaytime = true // Flag to track if it's daytime or nighttime
+    let cameraNode = SCNNode()
     let ambientLightNode = SCNNode()
+    var flashlightNode = SCNNode()
     var scnView: SCNView?
     var lastPanLocation: CGPoint?
+    // Fog variables
+    var fogSwitch: UISwitch!
+    var fogStartTextField: UITextField!
+    var fogEndTextField: UITextField!
+    var fogDensityTextField: UITextField!
+    var isFogEnabled = false;
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        // black background
+        scene.background.contents = UIColor.black
         // create and add a light to the scene
         let lightNode = SCNNode()
         lightNode.light = SCNLight()
@@ -54,9 +63,9 @@ class GameViewController: UIViewController {
         
         // add camera facing start of maze
         // Create a camera node
-        let cameraNode = SCNNode()
+        
         cameraNode.camera = SCNCamera()
-
+        
         // Set the position of the camera at the entrance of the maze
         let entrancePosition = SCNVector3(x: 0, y: 0, z: 0) // Assuming entrance is at the origin (adjust as needed)
         let cameraOffset = SCNVector3(x: 0, y: 1, z: -5) // Adjust the offset to position the camera correctly
@@ -65,13 +74,13 @@ class GameViewController: UIViewController {
             y: entrancePosition.y + cameraOffset.y,
             z: entrancePosition.z + cameraOffset.z
         )
-
+        
         // Set the orientation of the camera to face inside the maze
         cameraNode.eulerAngles = SCNVector3(x: 0, y: .pi, z: 0) // Rotate the camera 180 degrees around the y-axis
-
+        
         // Add the camera node to the scene
         scene.rootNode.addChildNode(cameraNode)
-
+        
         // Set the scene's default camera
         scnView.pointOfView = cameraNode
         
@@ -101,6 +110,10 @@ class GameViewController: UIViewController {
             toggleButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
         
+        // Add flashlight & fog controls
+        addFlashlight()
+        addFogControls()
+        
         // add a tap gesture recognizer
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         scnView.addGestureRecognizer(tapGesture)
@@ -108,14 +121,12 @@ class GameViewController: UIViewController {
         // Add pan gesture recognizer for movement
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
         scnView.addGestureRecognizer(panGesture)
-
+        
         // Add double tap gesture recognizer for reset
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
         doubleTapGesture.numberOfTapsRequired = 2
         scnView.addGestureRecognizer(doubleTapGesture)
     }
-    
-    
     
     @objc
     func handleTap(_ gestureRecognize: UIGestureRecognizer) {
@@ -154,20 +165,17 @@ class GameViewController: UIViewController {
     }
     
     @objc func handlePan(_ gestureRecognizer: UIPanGestureRecognizer) {
-        let translation = gestureRecognizer.translation(in: scnView)
         let location = gestureRecognizer.location(in: scnView)
         
         if let lastPanLocation = lastPanLocation {
             // Calculate the difference in movement
             let deltaX = Float(location.x - lastPanLocation.x)
             let deltaY = Float(location.y - lastPanLocation.y)
-            print(deltaX, "|", deltaY)
             // Adjust the camera position based on the movement
             let currentPosition = scnView?.pointOfView!.position
-
+            
             guard let currentPosition = currentPosition else {
                 print("current position is nil")
-                // Handle the case where currentPosition is nil
                 return
             }
             let newPosition = SCNVector3(currentPosition.x + deltaX * 0.01, currentPosition.y, currentPosition.z - deltaY * 0.01)
@@ -217,7 +225,7 @@ class GameViewController: UIViewController {
         let wallThickness: CGFloat = 0.1
         // Adjust the position of the walls to avoid perfect overlap
         let wallOffset: Float = -0.05 // Adjust as needed
-
+        
         // Load the floor texture image
         let floorTexture = UIImage(named: "floor.png") // Replace "floorTexture.jpg" with the actual name of your floor texture image
         
@@ -237,7 +245,7 @@ class GameViewController: UIViewController {
                 let cellGeometry = SCNBox(width: cellSize, height: 0.0, length: cellSize, chamferRadius: 0)
                 let cellNode = SCNNode(geometry: cellGeometry)
                 cellNode.position = SCNVector3(CGFloat(col) * cellSize, -0.5, CGFloat(row) * cellSize)
-
+                
                 // Apply floor texture to the cell
                 let material = SCNMaterial()
                 material.diffuse.contents = floorTexture
@@ -360,5 +368,162 @@ class GameViewController: UIViewController {
             ambientLightNode.light?.color = UIColor.white
         }
         isDaytime = !isDaytime // Toggle the flag
+    }
+    
+    // Sets up a flashlight
+    func addFlashlight() {
+        flashlightNode.name = "Flashlight"
+        flashlightNode.light = SCNLight()
+        flashlightNode.light!.type = SCNLight.LightType.spot
+        flashlightNode.light!.castsShadow = true
+        flashlightNode.light!.color = UIColor.yellow
+        flashlightNode.light!.intensity = 5000
+        flashlightNode.position = SCNVector3(0, 5, 3)
+        flashlightNode.rotation = SCNVector4(1, 0, 0, -Double.pi/3)
+        flashlightNode.light!.spotInnerAngle = 0
+        flashlightNode.light!.spotOuterAngle = 10
+        flashlightNode.light!.shadowColor = UIColor.black
+        flashlightNode.light!.zFar = 500
+        flashlightNode.light!.zNear = 50
+        scene.rootNode.addChildNode(flashlightNode)
+    }
+    
+    func addFogControls() {
+        // Add switch for toggling fog
+        fogSwitch = UISwitch()
+        fogSwitch.isOn = false // Fog is initially off
+        fogSwitch.addTarget(self, action: #selector(fogSwitchChanged(_:)), for: .valueChanged)
+        fogSwitch.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(fogSwitch)
+        
+        // Add label for fog switch
+        let fogSwitchLabel = UILabel()
+        fogSwitchLabel.text = "Toggle Fog"
+        fogSwitchLabel.textColor = UIColor.white
+        fogSwitchLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(fogSwitchLabel)
+        
+        // Add text fields for fog parameters
+        fogDensityTextField = addTextField(placeholder: "Fog Density", defaultValue: "0.1", action: #selector(fogDensityTextChanged(_:)))
+        fogStartTextField = addTextField(placeholder: "Fog Start Distance", defaultValue: "10", action: #selector(fogStartTextChanged(_:)))
+        fogEndTextField = addTextField(placeholder: "Fog End Distance", defaultValue: "50", action: #selector(fogEndTextChanged(_:)))
+        
+        // Add labels for text fields
+        let fogDensityLabel = addLabel(text: "Fog Density", textColor: UIColor.white)
+        let fogStartLabel = addLabel(text: "Fog Start Distance", textColor: UIColor.white)
+        let fogEndLabel = addLabel(text: "Fog End Distance", textColor: UIColor.white)
+        
+        // Layout constraints for fog controls
+        NSLayoutConstraint.activate([
+            fogSwitch.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            fogSwitch.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            
+            fogSwitchLabel.topAnchor.constraint(equalTo: fogSwitch.topAnchor),
+            fogSwitchLabel.leadingAnchor.constraint(equalTo: fogSwitch.trailingAnchor, constant: 8),
+            
+            fogDensityLabel.topAnchor.constraint(equalTo: fogSwitch.bottomAnchor, constant: 20),
+            fogDensityLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            
+            fogDensityTextField.topAnchor.constraint(equalTo: fogDensityLabel.bottomAnchor, constant: 8),
+            fogDensityTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            
+            fogStartLabel.topAnchor.constraint(equalTo: fogDensityTextField.bottomAnchor, constant: 20),
+            fogStartLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            
+            fogStartTextField.topAnchor.constraint(equalTo: fogStartLabel.bottomAnchor, constant: 8),
+            fogStartTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            
+            fogEndLabel.topAnchor.constraint(equalTo: fogStartTextField.bottomAnchor, constant: 20),
+            fogEndLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            
+            fogEndTextField.topAnchor.constraint(equalTo: fogEndLabel.bottomAnchor, constant: 8),
+            fogEndTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+        ])
+    }
+    
+    func addTextField(placeholder: String, defaultValue: String, action: Selector) -> UITextField {
+        let textField = UITextField()
+        textField.placeholder = placeholder
+        textField.text = defaultValue
+        textField.addTarget(self, action: action, for: .editingChanged)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.backgroundColor = UIColor.gray
+        view.addSubview(textField)
+        return textField
+    }
+    
+    
+    func addLabel(text: String, textColor: UIColor) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        label.textColor = textColor
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(label)
+        return label
+    }
+    
+    
+    
+    
+    
+    @objc func fogSwitchChanged(_ sender: UISwitch) {
+        // Toggle fog on/off based on switch state
+        if sender.isOn {
+            enableFog()
+        } else {
+            disableFog()
+        }
+    }
+    
+    func enableFog() {
+        guard let fogDensityText = fogDensityTextField.text,
+              let fogDensityValue = Float(fogDensityText),
+              let fogStartText = fogStartTextField.text,
+              let fogStartValue = Float(fogStartText),
+              let fogEndText = fogEndTextField.text,
+              let fogEndValue = Float(fogEndText) else {
+            print("Invalid fog parameter values")
+            return
+        }
+        
+        // Print debug information before setting fog values
+        print("Setting fog density: \(fogDensityValue), start distance: \(fogStartValue), end distance: \(fogEndValue)")
+        
+        // Set fog values in the scene
+        scene.fogStartDistance = CGFloat(fogStartValue)
+        scene.fogEndDistance = CGFloat(fogEndValue)
+        scene.fogDensityExponent = CGFloat(fogDensityValue)
+        scene.fogColor = UIColor.white
+        isFogEnabled = true
+        
+        // Print debug information after setting fog values
+        print("Fog enabled with density: \(scene.fogDensityExponent), start distance: \(scene.fogStartDistance), end distance: \(scene.fogEndDistance)")
+    }
+    
+    func disableFog() {
+        // Reset fog-related properties
+        scene.fogStartDistance = 0
+        scene.fogEndDistance = 0
+        scene.fogDensityExponent = 0 // Reset fog density
+        scene.fogColor = UIColor.clear
+        isFogEnabled = false
+        
+        // Print debug information
+        print("Fog disabled. Fog parameters reset.")
+    }
+    
+    @objc func fogDensityTextChanged(_ sender: UITextField) {
+        guard let text = sender.text, let density = Float(text) else { return }
+        scene.fogDensityExponent = CGFloat(density)
+    }
+    
+    @objc func fogStartTextChanged(_ sender: UITextField) {
+        guard let text = sender.text, let start = Float(text) else { return }
+        scene.fogStartDistance = CGFloat(start)
+    }
+    
+    @objc func fogEndTextChanged(_ sender: UITextField) {
+        guard let text = sender.text, let end = Float(text) else { return }
+        scene.fogEndDistance = CGFloat(end)
     }
 }
