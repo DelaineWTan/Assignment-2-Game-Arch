@@ -240,6 +240,10 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             hideConsole()
         } else {
             showConsole()
+            // Add minimap view to the console view
+            let minimapView = MiniMapView(frame: consoleView!.bounds)
+            minimapView.backgroundColor = .clear
+            consoleView?.addSubview(minimapView)
         }
     }
     
@@ -440,15 +444,19 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         flashlightNode.light!.castsShadow = true
         flashlightNode.light!.color = UIColor.yellow
         flashlightNode.light!.intensity = 5000
-        flashlightNode.position = SCNVector3(0, 5, 3)
-        flashlightNode.rotation = SCNVector4(1, 0, 0, -Double.pi/3)
         flashlightNode.light!.spotInnerAngle = 0
         flashlightNode.light!.spotOuterAngle = 10
         flashlightNode.light!.shadowColor = UIColor.black
         flashlightNode.light!.zFar = 500
         flashlightNode.light!.zNear = 50
-        scene.rootNode.addChildNode(flashlightNode)
+        
+        // Position the flashlight relative to the camera
+        flashlightNode.position = SCNVector3(0, 0, 5) // Example position, adjust as needed
+        
+        // Add the flashlight as a child node of the camera
+        cameraNode.addChildNode(flashlightNode)
     }
+
     
     func addFogControls() {
         // Add switch for toggling fog
@@ -467,7 +475,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // Add text fields for fog parameters
         fogDensityTextField = addTextField(placeholder: "Fog Density", defaultValue: "0.1", action: #selector(fogDensityTextChanged(_:)))
-        fogStartTextField = addTextField(placeholder: "Fog Start Distance", defaultValue: "10", action: #selector(fogStartTextChanged(_:)))
+        fogStartTextField = addTextField(placeholder: "Fog Start Distance", defaultValue: "1", action: #selector(fogStartTextChanged(_:)))
         fogEndTextField = addTextField(placeholder: "Fog End Distance", defaultValue: "50", action: #selector(fogEndTextChanged(_:)))
         
         // Add labels for text fields
