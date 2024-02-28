@@ -1,9 +1,3 @@
-//
-//  MiniMapView.swift
-//  Assignment 2
-//
-//  Created by Delaine Tan on 2024-02-21.
-//
 import UIKit
 import SceneKit
 
@@ -53,11 +47,24 @@ class MiniMapView: UIView {
             context.addLine(to: CGPoint(x: rect.width, y: y))
             context.strokePath()
         }
+        
+        // Highlight player position
+        if let playerPos = playerPosition {
+            print("playerPosX: ",playerPos.x, " playerPosZ:", playerPos.z)
+            let playerCol = Int(round(playerPos.x + 0.4))
+            let playerRow = Int(round(playerPos.z - 0.5) + 1)
+            print("x: ",playerCol, " z:", playerRow)
+            let x = CGFloat(playerCol) * cellWidth
+            let y = CGFloat(playerRow) * cellHeight
+            let playerRect = CGRect(x: x, y: y, width: cellWidth, height: cellHeight)
+            
+            context.setFillColor(UIColor.green.cgColor)
+            context.fill(playerRect)
+        }
     }
     
     func updatePlayerPosition(_ newPosition: SCNVector3) {
         playerPosition = newPosition
-        print(playerPosition)
+        setNeedsDisplay() // Request a redraw
     }
 }
-

@@ -15,7 +15,6 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
     var scnView: SCNView?
     let cameraNode = SCNNode()
     var lastPanLocation: CGPoint?
-    var playerPosition: SCNVector3?
     // Maze dimensions
     let mazeRows = 5;
     let mazeCols = 5;
@@ -32,6 +31,8 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
     // Console variables
     var consoleView: UIView?
     var isConsoleVisible = false
+    // Minimap view
+    var minimapView: MiniMapView?
     // Cube rotation
     var rotAngle = 0.0
     
@@ -88,10 +89,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // Add the camera node to the scene
         scene.rootNode.addChildNode(cameraNode)
-        
-        // Init player position to camera position
-        playerPosition = cameraNode.position
-        
+                
         // Set the scene's default camera
         scnView.pointOfView = cameraNode
         
@@ -150,6 +148,12 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         consoleView?.backgroundColor = UIColor.white
         consoleView?.alpha = 0.0 // Initially hidden
         view.addSubview(consoleView!)
+        
+        // Add minimap view to the console view with padding at the top
+        let padding: CGFloat = 50
+        minimapView = MiniMapView(frame: CGRect(x: 0, y: padding, width: consoleView!.bounds.width, height: consoleView!.bounds.height - padding), rows: mazeRows, cols: mazeCols, initialPlayerPosition: cameraNode.position)
+        minimapView!.backgroundColor = .clear
+        consoleView?.addSubview(minimapView!)
     }
     
     @objc
@@ -219,8 +223,8 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
                 cameraNode.eulerAngles.y += .pi * 2
             }
             
-            // Update player position
-            playerPosition = cameraNode.position
+            // Update player position in minimap
+            minimapView?.updatePlayerPosition(cameraNode.position)
         }
         
         // Update last pan location
@@ -252,12 +256,6 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             hideConsole()
         } else {
             showConsole()
-            // Add minimap view to the console view with padding at the top
-            let padding: CGFloat = 50
-            let minimapView = MiniMapView(frame: CGRect(x: 0, y: padding, width: consoleView!.bounds.width, height: consoleView!.bounds.height - padding), rows: mazeRows, cols: mazeCols, playerPosition: playerPosition)
-            minimapView.backgroundColor = .clear
-            consoleView?.addSubview(minimapView)
-
         }
     }
     
