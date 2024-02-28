@@ -27,6 +27,10 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
     var fogStartTextField: UITextField!
     var fogEndTextField: UITextField!
     var fogDensityTextField: UITextField!
+    var fogSwitchLabel: UILabel!
+    var fogDensityLabel: UILabel!
+    var fogStartLabel: UILabel!
+    var fogEndLabel: UILabel!
     var isFogEnabled = false;
     // Console variables
     var consoleView: UIView?
@@ -139,13 +143,13 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addGestureRecognizer(twoFingerDoubleTapGesture)
         
         // Initialize the console view
-        consoleView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 250))
+        consoleView = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 400))
         consoleView?.backgroundColor = UIColor.white
         consoleView?.alpha = 0.0 // Initially hidden
         view.addSubview(consoleView!)
         
         // Add minimap view to the console view with padding at the top
-        let padding: CGFloat = 50
+        let padding: CGFloat = 60
         minimapView = MiniMapView(frame: CGRect(x: 0, y: padding, width: consoleView!.bounds.width, height: consoleView!.bounds.height - padding), maze: maze, initialPlayerPosition: cameraNode.position, initialPlayerRotation: cameraNode.eulerAngles)
         minimapView!.backgroundColor = .clear
         consoleView?.addSubview(minimapView!)
@@ -169,12 +173,12 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             
             // highlight it
             SCNTransaction.begin()
-            SCNTransaction.animationDuration = 0.5
+            SCNTransaction.animationDuration = 0.6
             
             // on completion - unhighlight
             SCNTransaction.completionBlock = {
                 SCNTransaction.begin()
-                SCNTransaction.animationDuration = 0.5
+                SCNTransaction.animationDuration = 0.6
                 
                 material.emission.contents = UIColor.black
                 
@@ -253,14 +257,33 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
     
     // Show the console view
     func showConsole() {
+        // Hide fog controls
+        fogSwitch.isHidden = true
+        fogDensityTextField.isHidden = true
+        fogStartTextField.isHidden = true
+        fogEndTextField.isHidden = true
+        fogSwitchLabel.isHidden = true
+        fogDensityLabel.isHidden = true
+        fogStartLabel.isHidden = true
+        fogEndLabel.isHidden = true
+        
         UIView.animate(withDuration: 0.3) {
-            self.consoleView?.alpha = 0.5
+            self.consoleView?.alpha = 0.7
         }
         isConsoleVisible = true
     }
     
     // Hide the console view
     func hideConsole() {
+        // Show fog controls
+        fogSwitch.isHidden = false
+        fogDensityTextField.isHidden = false
+        fogStartTextField.isHidden = false
+        fogEndTextField.isHidden = false
+        fogSwitchLabel.isHidden = false
+        fogDensityLabel.isHidden = false
+        fogStartLabel.isHidden = false
+        fogEndLabel.isHidden = false
         UIView.animate(withDuration: 0.3) {
             self.consoleView?.alpha = 0.0
         }
@@ -449,7 +472,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         flashlightNode.light!.color = UIColor.yellow
         flashlightNode.light!.intensity = 5000
         flashlightNode.light!.spotInnerAngle = 0
-        flashlightNode.light!.spotOuterAngle = 10
+        flashlightNode.light!.spotOuterAngle = 20
         flashlightNode.light!.shadowColor = UIColor.black
         flashlightNode.light!.zFar = 500
         flashlightNode.light!.zNear = 50
@@ -467,7 +490,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addSubview(fogSwitch)
         
         // Add label for fog switch
-        let fogSwitchLabel = UILabel()
+        fogSwitchLabel = UILabel()
         fogSwitchLabel.text = "Toggle Fog"
         fogSwitchLabel.textColor = UIColor.white
         fogSwitchLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -479,9 +502,9 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         fogEndTextField = addTextField(placeholder: "Fog End Distance", defaultValue: "50", action: #selector(fogEndTextChanged(_:)))
         
         // Add labels for text fields
-        let fogDensityLabel = addLabel(text: "Fog Density", textColor: UIColor.white)
-        let fogStartLabel = addLabel(text: "Fog Start Distance", textColor: UIColor.white)
-        let fogEndLabel = addLabel(text: "Fog End Distance", textColor: UIColor.white)
+        fogDensityLabel = addLabel(text: "Fog Density", textColor: UIColor.white)
+        fogStartLabel = addLabel(text: "Fog Start Distance", textColor: UIColor.white)
+        fogEndLabel = addLabel(text: "Fog End Distance", textColor: UIColor.white)
         
         // Layout constraints for fog controls
         NSLayoutConstraint.activate([
