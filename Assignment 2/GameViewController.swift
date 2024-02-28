@@ -87,7 +87,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // Add the camera node to the scene
         scene.rootNode.addChildNode(cameraNode)
-                
+        
         // Set the scene's default camera
         scnView.pointOfView = cameraNode
         
@@ -146,7 +146,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // Add minimap view to the console view with padding at the top
         let padding: CGFloat = 50
-        minimapView = MiniMapView(frame: CGRect(x: 0, y: padding, width: consoleView!.bounds.width, height: consoleView!.bounds.height - padding), maze: maze, initialPlayerPosition: cameraNode.position)
+        minimapView = MiniMapView(frame: CGRect(x: 0, y: padding, width: consoleView!.bounds.width, height: consoleView!.bounds.height - padding), maze: maze, initialPlayerPosition: cameraNode.position, initialPlayerRotation: cameraNode.eulerAngles)
         minimapView!.backgroundColor = .clear
         consoleView?.addSubview(minimapView!)
     }
@@ -216,7 +216,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
                 cameraNode.eulerAngles.y += .pi * 2
             }
             // Update player position in minimap
-            minimapView?.updatePlayerPosition(cameraNode.position)
+            minimapView?.updatePlayerPosition(cameraNode.position, newRotation: cameraNode.eulerAngles)
         }
         // Update last pan location
         lastPanLocation = location
@@ -226,7 +226,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             lastPanLocation = nil
         }
     }
-
+    
     
     @objc func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
         // Reset the camera position to the default view
@@ -239,7 +239,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         )
         // Set the orientation of the camera to face inside the maze
         scnView?.pointOfView!.eulerAngles = SCNVector3(x: 0, y: .pi, z: 0)
-        minimapView?.updatePlayerPosition(cameraNode.position)
+        minimapView?.updatePlayerPosition(cameraNode.position, newRotation: cameraNode.eulerAngles)
     }
     
     // Handle the two-finger double-tap gesture

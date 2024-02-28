@@ -4,11 +4,13 @@ import SceneKit
 class MiniMapView: UIView {
     var maze: Maze
     var playerPosition: SCNVector3?
+    var playerRotation: SCNVector3?
     
-    init(frame: CGRect, maze: Maze, initialPlayerPosition: SCNVector3) {
+    init(frame: CGRect, maze: Maze, initialPlayerPosition: SCNVector3, initialPlayerRotation: SCNVector3) {
         self.maze = maze
         super.init(frame: frame)
         self.playerPosition = initialPlayerPosition
+        self.playerRotation = initialPlayerRotation
     }
     
     required init?(coder: NSCoder) {
@@ -65,21 +67,40 @@ class MiniMapView: UIView {
             }
         }
         
-        // Highlight player position
-        if let playerPos = playerPosition {
+        // Highlight player position with a triangle indicating the camera's direction
+        if let playerPos = playerPosition, let playerRot = playerRotation {
             let playerCol = Int(round(playerPos.x + 0.4))
             let playerRow = Int(round(playerPos.z - 0.5) + 1)
             let x = CGFloat(playerCol) * cellWidth
             let y = CGFloat(playerRow) * cellHeight
-            let playerRect = CGRect(x: x, y: y, width: cellWidth, height: cellHeight)
+            
+            // Calculate the angle to rotate the triangle
+            let angle = playerRot.y
+            
+            // Rotate the context around the triangle's center
+            let centerX = x + cellWidth / 2
+            let centerY = y + cellHeight / 2
+            context.translateBy(x: centerX, y: centerY)
+            context.rotate(by: CGFloat(angle))
+            context.translateBy(x: -centerX, y: -centerY)
+            
+            // Draw triangle
+            context.beginPath()
+            context.move(to: CGPoint(x: x + cellWidth / 2, y: y)) // Top vertex
+            context.addLine(to: CGPoint(x: x + cellWidth / 3, y: y + cellHeight)) // Bottom-left vertex
+            context.addLine(to: CGPoint(x: x + cellWidth * 2 / 3, y: y + cellHeight) ) // Bottom-right vertex
+            context.closePath()
             
             context.setFillColor(UIColor.green.cgColor)
-            context.fill(playerRect)
+            context.fillPath()
         }
+        
     }
     
-    func updatePlayerPosition(_ newPosition: SCNVector3) {
+    func updatePlayerPosition(_ newPosition: SCNVector3, newRotation: SCNVector3) {
         playerPosition = newPosition
+        playerRotation = newRotation
+        
         setNeedsDisplay() // Request a redraw
     }
 }
