@@ -16,8 +16,8 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
     let cameraNode = SCNNode()
     var lastPanLocation: CGPoint?
     // Maze dimensions
-    let mazeRows = 5;
-    let mazeCols = 5;
+    let mazeRows = 10;
+    let mazeCols = 10;
     // Light variables
     let ambientLightNode = SCNNode()
     var flashlightNode = SCNNode()
@@ -101,10 +101,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         reanimate()
         
         // Create the maze node
-        let mazeNode = createMazeNode()
-        
-        // Add the maze node to the scene
-        scene.rootNode.addChildNode(mazeNode)
+        let maze = createMaze()
         
         // Add button to toggle day/night
         let toggleButton = UIButton(type: .system)
@@ -151,7 +148,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // Add minimap view to the console view with padding at the top
         let padding: CGFloat = 50
-        minimapView = MiniMapView(frame: CGRect(x: 0, y: padding, width: consoleView!.bounds.width, height: consoleView!.bounds.height - padding), rows: mazeRows, cols: mazeCols, initialPlayerPosition: cameraNode.position)
+        minimapView = MiniMapView(frame: CGRect(x: 0, y: padding, width: consoleView!.bounds.width, height: consoleView!.bounds.height - padding), maze: maze, initialPlayerPosition: cameraNode.position)
         minimapView!.backgroundColor = .clear
         consoleView?.addSubview(minimapView!)
     }
@@ -248,6 +245,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         )
         // Set the orientation of the camera to face inside the maze
         scnView?.pointOfView!.eulerAngles = SCNVector3(x: 0, y: .pi, z: 0)
+        minimapView?.updatePlayerPosition(cameraNode.position)
     }
     
     // Handle the two-finger double-tap gesture
@@ -262,7 +260,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
     // Show the console view
     func showConsole() {
         UIView.animate(withDuration: 0.3) {
-            self.consoleView?.alpha = 1.0
+            self.consoleView?.alpha = 0.5
         }
         isConsoleVisible = true
     }
@@ -292,7 +290,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    func createMazeNode() -> SCNNode {
+    func createMaze() -> Maze {
         let mazeNode = SCNNode()
         
         var maze = Maze(Int32(mazeRows), Int32(mazeCols))
@@ -398,8 +396,8 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
                 }
             }
         }
-        
-        return mazeNode
+        scene.rootNode.addChildNode(mazeNode)
+        return maze
     }
     
     func createWall(position: SCNVector3, width: CGFloat, height: CGFloat, length: CGFloat, textureName: String, inScene scene: SCNScene) -> SCNNode {

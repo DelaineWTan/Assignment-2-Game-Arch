@@ -2,13 +2,11 @@ import UIKit
 import SceneKit
 
 class MiniMapView: UIView {
-    var mazeRows: Int
-    var mazeCols: Int
+    var maze: Maze
     var playerPosition: SCNVector3?
     
-    init(frame: CGRect, rows: Int, cols: Int, initialPlayerPosition: SCNVector3) {
-        self.mazeRows = rows
-        self.mazeCols = cols
+    init(frame: CGRect, maze: Maze, initialPlayerPosition: SCNVector3) {
+        self.maze = maze
         super.init(frame: frame)
         self.playerPosition = initialPlayerPosition
     }
@@ -22,8 +20,8 @@ class MiniMapView: UIView {
         
         guard let context = UIGraphicsGetCurrentContext() else { return }
         
-        let numRows = mazeRows
-        let numCols = mazeCols
+        let numRows = maze.rows
+        let numCols = maze.cols
         
         let cellWidth = rect.width / CGFloat(numCols)
         let cellHeight = rect.height / CGFloat(numRows)
@@ -32,20 +30,39 @@ class MiniMapView: UIView {
         context.setStrokeColor(UIColor.black.cgColor)
         context.setLineWidth(1.0)
         
-        // Draw vertical lines
-        for col in 0..<numCols {
-            let x = CGFloat(col) * cellWidth
-            context.move(to: CGPoint(x: x, y: 0))
-            context.addLine(to: CGPoint(x: x, y: rect.height))
-            context.strokePath()
-        }
-        
-        // Draw horizontal lines
+        // Draw horizontal lines and color-coded walls
         for row in 0..<numRows {
-            let y = CGFloat(row) * cellHeight
-            context.move(to: CGPoint(x: 0, y: y))
-            context.addLine(to: CGPoint(x: rect.width, y: y))
-            context.strokePath()
+            for col in 0..<numCols {
+                let cell = maze.GetCell(row, col)
+                let x = CGFloat(col) * cellWidth
+                let y = CGFloat(row) * cellHeight
+                
+                // Draw walls based on maze configuration with color coding
+                if cell.northWallPresent {
+                    context.setStrokeColor(UIColor.red.cgColor) // Wall facing up
+                    context.move(to: CGPoint(x: x, y: y))
+                    context.addLine(to: CGPoint(x: x + cellWidth, y: y))
+                    context.strokePath()
+                }
+                if cell.southWallPresent {
+                    context.setStrokeColor(UIColor.blue.cgColor) // Wall facing down
+                    context.move(to: CGPoint(x: x, y: y + cellHeight))
+                    context.addLine(to: CGPoint(x: x + cellWidth, y: y + cellHeight))
+                    context.strokePath()
+                }
+                if cell.westWallPresent {
+                    context.setStrokeColor(UIColor.green.cgColor) // Wall facing left
+                    context.move(to: CGPoint(x: x, y: y))
+                    context.addLine(to: CGPoint(x: x, y: y + cellHeight))
+                    context.strokePath()
+                }
+                if cell.eastWallPresent {
+                    context.setStrokeColor(UIColor.orange.cgColor) // Wall facing right
+                    context.move(to: CGPoint(x: x + cellWidth, y: y))
+                    context.addLine(to: CGPoint(x: x + cellWidth, y: y + cellHeight))
+                    context.strokePath()
+                }
+            }
         }
         
         // Highlight player position
