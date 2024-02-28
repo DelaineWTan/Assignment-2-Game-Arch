@@ -64,8 +64,6 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         // set the scene to the view
         scnView.scene = scene
         
-        // allows the user to manipulate the camera
-        scnView.allowsCameraControl = true
         
         // show statistics such as fps and timing information
         scnView.showsStatistics = true
@@ -208,22 +206,18 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             let newX = cameraNode.position.x - sin(currentRotationY) * xDelta
             let newZ = cameraNode.position.z - cos(currentRotationY) * xDelta
             cameraNode.position = SCNVector3(newX, cameraNode.position.y, newZ)
-            
             // Adjust player rotation left and right along the Y-axis
             let yDelta = deltaX * 0.01 // deltaX corresponds to horizontal movement
             cameraNode.eulerAngles.y += yDelta
-            
             // Ensure that the player's rotation remains within a reasonable range
             if cameraNode.eulerAngles.y > .pi {
                 cameraNode.eulerAngles.y -= .pi * 2
             } else if cameraNode.eulerAngles.y < -.pi {
                 cameraNode.eulerAngles.y += .pi * 2
             }
-            
             // Update player position in minimap
             minimapView?.updatePlayerPosition(cameraNode.position)
         }
-        
         // Update last pan location
         lastPanLocation = location
         
@@ -460,13 +454,9 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         flashlightNode.light!.zFar = 500
         flashlightNode.light!.zNear = 50
         
-        // Position the flashlight relative to the camera
-        flashlightNode.position = SCNVector3(0, 0, 5) // Example position, adjust as needed
-        
         // Add the flashlight as a child node of the camera
         cameraNode.addChildNode(flashlightNode)
     }
-
     
     func addFogControls() {
         // Add switch for toggling fog

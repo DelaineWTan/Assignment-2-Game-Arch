@@ -67,10 +67,8 @@ class MiniMapView: UIView {
         
         // Highlight player position
         if let playerPos = playerPosition {
-            print("playerPosX: ",playerPos.x, " playerPosZ:", playerPos.z)
             let playerCol = Int(round(playerPos.x + 0.4))
             let playerRow = Int(round(playerPos.z - 0.5) + 1)
-            print("x: ",playerCol, " z:", playerRow)
             let x = CGFloat(playerCol) * cellWidth
             let y = CGFloat(playerRow) * cellHeight
             let playerRect = CGRect(x: x, y: y, width: cellWidth, height: cellHeight)
