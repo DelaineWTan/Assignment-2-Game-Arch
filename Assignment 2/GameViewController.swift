@@ -22,6 +22,7 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
     let ambientLightNode = SCNNode()
     var flashlightNode = SCNNode()
     var isDaytime = true
+    var isFlashlightOn = true
     // Fog variables
     var fogSwitch: UISwitch!
     var fogStartTextField: UITextField!
@@ -106,16 +107,29 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
         let maze = createMaze()
         
         // Add button to toggle day/night
-        let toggleButton = UIButton(type: .system)
-        toggleButton.setTitle("Toggle Day/Night", for: .normal)
-        toggleButton.addTarget(self, action: #selector(toggleDayNight), for: .touchUpInside)
-        toggleButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(toggleButton)
+        let dayNightToggleButton = UIButton(type: .system)
+        dayNightToggleButton.setTitle("Toggle Day/Night", for: .normal)
+        dayNightToggleButton.addTarget(self, action: #selector(toggleDayNight), for: .touchUpInside)
+        dayNightToggleButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(dayNightToggleButton)
         
         // Add constraints for button position
         NSLayoutConstraint.activate([
-            toggleButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            toggleButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            dayNightToggleButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            dayNightToggleButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+        ])
+        
+        // Add button to toggle day/night
+        let flashlightToggleButton = UIButton(type: .system)
+        flashlightToggleButton.setTitle("Toggle Flashlight", for: .normal)
+        flashlightToggleButton.addTarget(self, action: #selector(toggleFlashlight), for: .touchUpInside)
+        flashlightToggleButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(flashlightToggleButton)
+        
+        // Add constraints for button position
+        NSLayoutConstraint.activate([
+            flashlightToggleButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            flashlightToggleButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
         ])
         
         // Add flashlight & fog controls
@@ -461,6 +475,19 @@ class GameViewController: UIViewController, UIGestureRecognizerDelegate {
             ambientLightNode.light?.color = UIColor.white
         }
         isDaytime = !isDaytime // Toggle the flag
+    }
+    
+    // Method to toggle flashlight
+    @objc
+    func toggleFlashlight() {
+        if isFlashlightOn {
+            // Set nighttime color
+            flashlightNode.light?.intensity = 0
+        } else {
+            // Set daytime color
+            flashlightNode.light?.intensity = 5000
+        }
+        isFlashlightOn = !isFlashlightOn // Toggle the flag
     }
     
     // Sets up a flashlight
